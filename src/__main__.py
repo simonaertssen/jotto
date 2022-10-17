@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-def main():
-    pass
 
+import time
+
+from src.jotto import solve
 
 if __name__ == "__main__":
-    main()
+    start: float = time.time()
+    solve()
+    print(f"Solved in {time.time() - start}s")
