@@ -2,7 +2,7 @@
 import unittest
 from string import ascii_lowercase
 
-from src.jotto import decode, encode, iscandidate, remove_leading_bit
+from src.jotto import encode, iscandidate, remove_leading_bit
 
 
 class TestJottoHelperFunctions(unittest.TestCase):
@@ -18,7 +18,10 @@ class TestJottoHelperFunctions(unittest.TestCase):
 
     def test_remove_leading_bit(self) -> None:
         """Test whether we can correctly remove the first bit."""
-        self.assertEqual(int('1' * 26, 2), remove_leading_bit(int('1' * 27, 2)))
+        bitword: str = '101101101001011010010011001'
+        value: int = int(bitword, base=2)
+        result: int = remove_leading_bit(value)
+        self.assertEqual(result, int(bitword[1:], 2))
 
     def test_word_encoding(self) -> None:
         """Test the correct encoding of a word."""
@@ -34,11 +37,11 @@ class TestJottoHelperFunctions(unittest.TestCase):
     #     for word in ['wacko', 'ceils', 'funky']:
     #         bitword: int = encode(word)
 
-    def test_word_decoding(self) -> None:
-        """Test the correct decoding of a word."""
-        for w in self.words:
-            print(w)
-            self.assertEqual(set(w), set(decode(encode(w))))
+    # def test_word_decoding(self) -> None:
+    #     """Test the correct decoding of a word."""
+    #     for w in self.words:
+    #         print(w)
+    #         self.assertEqual(set(w), set(decode(encode(w))))
 
 
 if __name__ == "__main__":

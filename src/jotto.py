@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import re
 from string import ascii_lowercase
-from typing import Generator, TextIO
+from typing import TextIO
 
 
 def iscandidate(word: str, wordlen: int = 5) -> bool:
@@ -39,25 +38,25 @@ def encode(word: str) -> int:
 
 def seen_before(a: int, b: int) -> bool:
     """Compute the AND of a and b, considering they have a leading 1."""
-    return (a & b) ^ (2**26 - 1)
+    return remove_leading_bit(a & b)
 
 
-def decode(intword: str) -> int:
-    """
-    Decode an integer to a string: index which letters are being used.
-    Assume the word is lowercase and consists of 5 letters.
-    """
-    print(f"{intword:b}")
-    maskedword: int = intword & (2**26 - 1)  # Mask the leading bit
-    print(f"{maskedword:b}")
+# def decode(intword: str) -> int:
+#     """
+#     Decode an integer to a string: index which letters are being used.
+#     Assume the word is lowercase and consists of 5 letters.
+#     """
+#     print(f"{intword:b}")
+#     maskedword: int = intword & (2**26 - 1)  # Mask the leading bit
+#     print(f"{maskedword:b}")
 
-    ones: Generator = re.finditer('1', f"{intword:b}")
-    next(ones)  # Skip the leading 1
+#     ones: Generator = re.finditer('1', f"{intword:b}")
+#     next(ones)  # Skip the leading 1
 
-    ones = list(ones)
-    print([m.start() - 1 for m in ones])
-    letters: list = [ascii_lowercase[i.start() - 1] for i in ones]
-    return ''.join(letters)
+#     ones = list(ones)
+#     print([m.start() - 1 for m in ones])
+#     letters: list = [ascii_lowercase[i.start() - 1] for i in ones]
+#     return ''.join(letters)
 
 
 def solve() -> None:
