@@ -1,13 +1,5 @@
 .DS_Store
 
-# Large pretrained models
-*.pth
-*.pkl
-
-# Large datasets:
-*.csv
-*.parquet
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
