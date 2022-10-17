@@ -32,17 +32,6 @@ class TestJottoHelperFunctions(unittest.TestCase):
             self.assertEqual(bitword, encode(testword))
             self.assertEqual(len(f"{bitword:b}"), len(ascii_lowercase) + 1)
 
-    # def test_encoding_leading_mask(self) -> None:
-    #     """Test whether we can remove the leading 1 from a number."""
-    #     for word in ['wacko', 'ceils', 'funky']:
-    #         bitword: int = encode(word)
-
-    # def test_word_decoding(self) -> None:
-    #     """Test the correct decoding of a word."""
-    #     for w in self.words:
-    #         print(w)
-    #         self.assertEqual(set(w), set(decode(encode(w))))
-
 
 if __name__ == "__main__":
     unittest.main()

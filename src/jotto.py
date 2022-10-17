@@ -41,24 +41,6 @@ def seen_before(a: int, b: int) -> bool:
     return remove_leading_bit(a & b)
 
 
-# def decode(intword: str) -> int:
-#     """
-#     Decode an integer to a string: index which letters are being used.
-#     Assume the word is lowercase and consists of 5 letters.
-#     """
-#     print(f"{intword:b}")
-#     maskedword: int = intword & (2**26 - 1)  # Mask the leading bit
-#     print(f"{maskedword:b}")
-
-#     ones: Generator = re.finditer('1', f"{intword:b}")
-#     next(ones)  # Skip the leading 1
-
-#     ones = list(ones)
-#     print([m.start() - 1 for m in ones])
-#     letters: list = [ascii_lowercase[i.start() - 1] for i in ones]
-#     return ''.join(letters)
-
-
 def solve() -> None:
     """
     Solve the jotto problem: find five english words that are each five letters longs
