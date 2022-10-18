@@ -21,6 +21,11 @@ def remove_leading_bit(x: int) -> int:
     return x & 0x3ffffff
 
 
+def seen_before(a: int, b: int) -> bool:
+    """Compute the AND of a and b, considering they have a leading 1."""
+    return remove_leading_bit(a & b) != 0
+
+
 def encode(word: str) -> int:
     """
     Encode a word for fast comparisons: index which letters are being used.
@@ -36,17 +41,10 @@ def encode(word: str) -> int:
     return int(bitword, base=2)
 
 
-def seen_before(a: int, b: int) -> bool:
-    """Compute the AND of a and b, considering they have a leading 1."""
-    return remove_leading_bit(a & b)
-
-
 def solve() -> None:
     """
     Solve the jotto problem: find five english words that are each five letters longs
     and which use 25 different letters of the western alphabet.
-
-    filename: str = path to the file containing English words
     """
 
     # Find the file and open it, start
@@ -56,6 +54,8 @@ def solve() -> None:
     # Initialise an empty set of solutions and start solving
     solutions: set = set()
     letters_taken: int = 0
+
+    count = 0
     for word in filestream:
         word = word.strip()
 
@@ -63,19 +63,19 @@ def solve() -> None:
             continue
 
         bitword: int = encode(word)
+        # print(f'candidate {word} = {bitword:b}: {seen_before(bitword, letters_taken):b}')
         if not seen_before(bitword, letters_taken):
-            print(word)
-            print("{:b}".format(bitword))
-            print("{:b}".format(letters_taken))
+            # print("{:b}".format(seen_before(bitword, letters_taken)))
+            # print("{:b}".format(bitword))
 
             solutions.add(word)
-            letters_taken ^= bitword
-
+            letters_taken |= bitword
+            print("letters_taken:    {:b}".format(letters_taken))
             input()
 
     # Cleanup
     filestream.close()
-
+    print(count)
     print(solutions)
     print(len(solutions))
     assert len(solutions) == 538
