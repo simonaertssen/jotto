@@ -2,7 +2,7 @@
 import unittest
 from string import ascii_lowercase
 
-from src.jotto import encode, iscandidate, remove_leading_bit
+from src.jotto import encode, iscandidate
 
 
 class TestJottoHelperFunctions(unittest.TestCase):
@@ -36,7 +36,6 @@ class TestJottoHelperFunctions(unittest.TestCase):
         for word in words:
             result |= encode(word)
 
-        result = remove_leading_bit(result)
         self.assertEqual(bin(result).count('1'), 25)
 
 

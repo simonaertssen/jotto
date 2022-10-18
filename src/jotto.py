@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from collections import defaultdict
 from typing import TextIO
 
 
@@ -37,41 +38,44 @@ def solve() -> None:
     filename: str = os.path.join('data', 'words_alpha.txt')
     filestream: TextIO = open(filename, 'r', newline=None)
 
-    anagrams: dict[list] = {}
+    anagrams: defaultdict[set] = defaultdict(set)
     for word in filestream:
         word = word.strip()
         if not iscandidate(word):
             continue
 
         intword: int = encode(word)
-        if word not in anagrams:
-            anagrams[intword] = [word]
-        else:
-            anagrams[intword].append(word)
+        anagrams[intword].add(word)
 
-    # Initialise an empty set of solutions and start solving
-    solutions: set = set()
-
-    for word in filestream:
-        word = word.strip()
-
-        if not iscandidate(word):
-            continue
-
-        bitword: int = encode(word)
-        # print(f"{bitword:b}")
-        # print(ascii_lowercase)
-        # print(f'candidate {word} = {bitword:b}: {seen_before(bitword, letters_taken):b}')
-        if not seen_before(bitword, letters_taken):
-            # print("{:b}".format(seen_before(bitword, letters_taken)))
-            # print("{:b}".format(bitword))
-
-            solutions.add(word)
-            # print(f"{bitword:b}")
-            # input()
-
-    # Cleanup
     filestream.close()
-    print(solutions)
-    print(len(solutions))
-    assert len(solutions) == 538
+
+    # Now build a graph of words using the registered anagrams
+    bitgraph: defaultdict[set] = defaultdict(set)
+
+    bitwords: list[int] = sorted(anagrams.keys())
+    for i, thisbitword in enumerate(bitwords):
+        for thatbitword in bitwords[i + 1:]:
+            # If this and that word do not have bits in common,
+            # save them in the same set.
+            if not (thisbitword & thatbitword):
+                bitgraph[thisbitword].add(thatbitword)
+
+    # solutions: set = set()
+    # for k, s in bitgraph.items():
+
+    # def recursive_search(bitgraph: dict, word: int, neighbours: set[int], chain: int, length: int) -> set:
+    #     """
+    #     Recursively search solutions by testing words that could fit onto the chain.
+
+    #     bitgraph    (dict): stores the mapping from a word to all other words that have no letter in common.
+    #     word        (int): the current word.
+    #     neighbours  (set): words that have no letters in common with the word.
+    #     chain       (int): the hash of the current chain of words.
+    #     length      (int): the length of the current chain of words.
+    #     """
+    #     for nghbr in bitgraph[word]:
+    #         if not (nghbr & chain):
+
+    res = encode('dwarf')
+    print(bitgraph[res])
+    # print(bitgraph[anagrams[res]])
