@@ -4,13 +4,16 @@ import os
 from collections import defaultdict
 from typing import TextIO
 
+from tqdm import tqdm
+
 
 def iscandidate(word: str, wordlen: int = 5) -> bool:
     """
     Idenitfy whether the word is a candidate for our solution.
     Assume the word is lowercase.
     """
-    return len(word) == wordlen and not {"a", "e", "i", "o", "u"}.isdisjoint(word)
+
+    return len(set(word)) == len(word) == wordlen
 
 
 def encode(word: str) -> int:
@@ -26,6 +29,35 @@ def encode(word: str) -> int:
     ret |= 1 << (ord(word[3]) - a)
     ret |= 1 << (ord(word[4]) - a)
     return ret
+
+
+def no_common_letters(this: int, that: int) -> bool:
+    """Compute the AND of a and b, considering they have a leading 1."""
+    return (this & that) == 0
+
+
+def recursive_search(bitgraph: dict, rosetta: dict, chain: set, chainhash: int, word: int) -> set:
+    """
+    Recursively search solutions by testing words that could fit onto the chain.
+    bitgraph    (dict): stores the mapping from a word to all other words that have no letter in common.
+    rosetta     (dict): translate the word as an integer to the word as a string.
+    word        (int): the current word under review.
+    chain       (set): the chain of words that share no letters.
+    chainhash   (int): the hash of the current chain of words.
+    """
+    solutions: set = set()
+    for nghbr in bitgraph[word]:
+        if no_common_letters(nghbr, chainhash):
+            chain.add(rosetta[nghbr])
+
+            if len(chain) == 5:
+                encode: str = (str(link) for link in sorted(chain))
+                solutions.add(':'.join(encode))
+
+            result: set = recursive_search(bitgraph, rosetta, chain, nghbr & chainhash, nghbr)
+            solutions.union(result)
+
+    return solutions
 
 
 def solve() -> None:
@@ -57,25 +89,19 @@ def solve() -> None:
         for thatbitword in bitwords[i + 1:]:
             # If this and that word do not have bits in common,
             # save them in the same set.
-            if not (thisbitword & thatbitword):
+            if no_common_letters(thisbitword, thatbitword):
                 bitgraph[thisbitword].add(thatbitword)
 
-    # solutions: set = set()
-    # for k, s in bitgraph.items():
+    solution: set = set()
+    for (anchor, chain) in tqdm(bitgraph.items()):
+        for link in chain:
+            chainset: set = {anchor, link}
+            chainsethash: int = (anchor & link)
+            solution.union(recursive_search(bitgraph, anagrams, chain=chainset,
+                                            chainhash=chainsethash, word=link))
 
-    # def recursive_search(bitgraph: dict, word: int, neighbours: set[int], chain: int, length: int) -> set:
-    #     """
-    #     Recursively search solutions by testing words that could fit onto the chain.
+    print(len(solution))
 
-    #     bitgraph    (dict): stores the mapping from a word to all other words that have no letter in common.
-    #     word        (int): the current word.
-    #     neighbours  (set): words that have no letters in common with the word.
-    #     chain       (int): the hash of the current chain of words.
-    #     length      (int): the length of the current chain of words.
-    #     """
-    #     for nghbr in bitgraph[word]:
-    #         if not (nghbr & chain):
-
-    res = encode('dwarf')
-    print(bitgraph[res])
+    # res = encode('dwarf')
+    # print(bitgraph[res])
     # print(bitgraph[anagrams[res]])
