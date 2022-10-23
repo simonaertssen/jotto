@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from itertools import combinations
 from typing import TextIO
 
 import numpy as np
@@ -92,26 +93,44 @@ def solve() -> None:
     for i, thisbitword in enumerate(allwords):
         for j, thatbitword in enumerate(allwords[i + 1:]):
             # If this and that word do not have bits in common, save them in the same set.
-            print(anagrams[thisbitword], anagrams[thatbitword])
             if no_common_letters(thisbitword, thatbitword):
-                graph[i, j + i + 1] = 1
+                graph[i, j + i + 1] = graph[j + i + 1, i] = 1
 
     # Now traverse the graph and detect cycles that consist of five steps
-
     print(graph)
+
     solutions: list[list[int]] = []
-    for i in tqdm(range(numwords)):
-        for j in np.where(graph[i, :] == 1)[0]:
-            for k in np.where(graph[j, :] == 1)[0]:
-                for l in np.where(graph[k, :] == 1)[0]:
-                    for m in np.where(graph[l, :] == 1)[0]:
-                        if i == m:
-                            # print(f"{i} {j} {k} {l} {m}")
-                            solutions.append([allwords[i], allwords[j], allwords[k], allwords[l], allwords[m]])
-                            print(solutions[-1])
-                            graph[i, j] = 0
-                            graph[j, k] = 0
-                            graph[k, l] = 0
-                            graph[l, m] = 0
+    nosolutions: list[set[int]] = []
+
+    subgraph = np.zeros((5, 5), dtype=np.uint8)
+
+    for i in tqdm(range(numwords)):  # Go word by word
+        neighbours = np.where(graph[i, :] == 1)[0]
+        for group in combinations(neighbours - 1, 5):  # -1 because the indices in the main graph change
+            # Take links, but this first row can be excluded because we expect a fully filled first row
+            subgraph[0, 1] = graph[group[0], group[1]]
+            subgraph[0, 2] = graph[group[0], group[2]]
+            subgraph[0, 3] = graph[group[0], group[3]]
+            subgraph[0, 4] = graph[group[0], group[4]]
+
+            subgraph[1, 2] = graph[group[1], group[2]]
+            subgraph[1, 3] = graph[group[1], group[3]]
+            subgraph[1, 4] = graph[group[1], group[4]]
+
+            subgraph[2, 3] = graph[group[2], group[3]]
+            subgraph[2, 4] = graph[group[2], group[4]]
+
+            subgraph[3, 4] = graph[group[3], group[4]]
+
+            print(subgraph)
+            test = subgraph @ subgraph @ subgraph @ subgraph @ subgraph
+            print(test)
+            print(test.sum(0))
+
+            # print(group)
+            # print(next(product(group, group)))
+            break
+
+        break
 
     print(len(solutions))
