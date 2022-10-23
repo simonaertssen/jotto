@@ -2,7 +2,7 @@
 import unittest
 from string import ascii_lowercase
 
-from src.jotto import encode, iscandidate, no_common_letters, recursive_search
+from src.jotto import encode, has_letter, iscandidate, no_common_letters
 
 
 class TestJottoHelperFunctions(unittest.TestCase):
@@ -36,6 +36,17 @@ class TestJottoHelperFunctions(unittest.TestCase):
         self.assertFalse(no_common_letters(this, this))
         self.assertFalse(no_common_letters(that, that))
 
+    def test_has_letter(self) -> None:
+        """Test whether a certain word has a specific leter."""
+        bitword: int = encode('words')
+        self.assertTrue(has_letter(bitword, ord('w') - ord('a')))
+        self.assertTrue(has_letter(bitword, ord('o') - ord('a')))
+        self.assertTrue(has_letter(bitword, ord('r') - ord('a')))
+        self.assertTrue(has_letter(bitword, ord('d') - ord('a')))
+        self.assertTrue(has_letter(bitword, ord('s') - ord('a')))
+        self.assertFalse(has_letter(bitword, ord('a') - ord('a')))
+        self.assertFalse(has_letter(bitword, ord('z') - ord('a')))
+
     def test_existing_solution(self) -> None:
         """Test an existing solution to see if it can be detected with our current tools."""
         words: list[str] = ['dwarf', 'glyph', 'jocks', 'muntz', 'vibex']
@@ -43,13 +54,6 @@ class TestJottoHelperFunctions(unittest.TestCase):
         for word in words:
             result |= encode(word)
         self.assertEqual(bin(result).count('1'), 25)
-
-    def test_recursive_search(self) -> None:
-        """Test whether the recursive approach can work."""
-        words: list[str] = ['dwarf', 'glyph', 'jocks', 'muntz', 'vibex']
-        anagrams: dict = {encode(word): word for word in words}
-
-        recursive_search(bitgraph, anagrams, solution, chainset, chainsethash, link)
 
 
 if __name__ == "__main__":
