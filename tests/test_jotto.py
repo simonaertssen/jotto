@@ -2,7 +2,7 @@
 import unittest
 from string import ascii_lowercase
 
-from src.jotto import encode, iscandidate, no_common_letters
+from src.jotto import encode, iscandidate, no_common_letters, recursive_search
 
 
 class TestJottoHelperFunctions(unittest.TestCase):
@@ -42,11 +42,14 @@ class TestJottoHelperFunctions(unittest.TestCase):
         result: int = 0
         for word in words:
             result |= encode(word)
-
         self.assertEqual(bin(result).count('1'), 25)
 
     def test_recursive_search(self) -> None:
-        """Test whether the rec"""
+        """Test whether the recursive approach can work."""
+        words: list[str] = ['dwarf', 'glyph', 'jocks', 'muntz', 'vibex']
+        anagrams: dict = {encode(word): word for word in words}
+
+        recursive_search(bitgraph, anagrams, solution, chainset, chainsethash, link)
 
 
 if __name__ == "__main__":
