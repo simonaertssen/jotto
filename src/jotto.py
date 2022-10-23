@@ -3,6 +3,9 @@
 import os
 from typing import TextIO
 
+import numpy as np
+from tqdm import tqdm
+
 
 def iscandidate(word: str, wordlen: int = 5) -> bool:
     """
@@ -65,7 +68,7 @@ def solve() -> None:
     """
 
     # Find the file and open it, start building a database of words
-    filename: str = os.path.join('data', 'words_alpha.txt')
+    filename: str = os.path.join('data', 'test.txt')
     filestream: TextIO = open(filename, 'r', newline=None)
 
     # anagrams: defaultdict[set] = defaultdict(set)
@@ -81,3 +84,34 @@ def solve() -> None:
             anagrams[intword] = word
 
     filestream.close()
+
+    # Now build a graph of words using the registered anagrams
+    numwords: int = len(anagrams)
+    graph: np.ndarray = np.zeros((numwords, numwords), dtype=np.uint8)
+    allwords: list[int] = [*anagrams.keys()]
+    for i, thisbitword in enumerate(allwords):
+        for j, thatbitword in enumerate(allwords[i + 1:]):
+            # If this and that word do not have bits in common, save them in the same set.
+            print(anagrams[thisbitword], anagrams[thatbitword])
+            if no_common_letters(thisbitword, thatbitword):
+                graph[i, j + i + 1] = 1
+
+    # Now traverse the graph and detect cycles that consist of five steps
+
+    print(graph)
+    solutions: list[list[int]] = []
+    for i in tqdm(range(numwords)):
+        for j in np.where(graph[i, :] == 1)[0]:
+            for k in np.where(graph[j, :] == 1)[0]:
+                for l in np.where(graph[k, :] == 1)[0]:
+                    for m in np.where(graph[l, :] == 1)[0]:
+                        if i == m:
+                            # print(f"{i} {j} {k} {l} {m}")
+                            solutions.append([allwords[i], allwords[j], allwords[k], allwords[l], allwords[m]])
+                            print(solutions[-1])
+                            graph[i, j] = 0
+                            graph[j, k] = 0
+                            graph[k, l] = 0
+                            graph[l, m] = 0
+
+    print(len(solutions))
